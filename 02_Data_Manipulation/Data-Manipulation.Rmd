@@ -1,0 +1,137 @@
+# Data Manipulation in R
+
+<hr>
+
+### Daniel J. Hocking
+### 22 November 2013
+### R Working Group
+
+<hr>
+
+R is a great resource and has become the lingua franca for statistics in ecology. R is not the best of languages but it has to big advantages: a large ecology user base and a large, centralized repository of contributed packages (CRAN). R is an incredibly flexible language, possibly to a fault. For example to extract a column from a data frame (we'll call toy) you can do any of the following:
+
+```{r}
+a <- c('one', 'two', 'three', 'four')
+b <- c(1, 2, 3, 4)
+c <- c(1.1, 2.2, 3.3, 4.4)
+toy <- data.frame(a, b, c)
+
+str(toy)
+summary(toy)
+```
+
+```{r}
+toy[ , 1]
+toy$a
+toy[ ,c('a')]
+toy[['a']]
+```
+
+As you can see, this all produces the same results. In other languages, you can usually only access a portion of the toy in 1 way. While the flexiblity of R can be useful at times, it can cause confusion and creates an extremely steep learning curve. It's difficult to read the code from other people without a much larger vocabularly.
+
+Add a column to a toyframe
+```{r}
+d <- seq(from = 100, to = 200, length.out = 4)
+d
+(e <- seq(100, 200, length.out = 4))
+e[3]
+(e3 <- e[3] + 0.000002)
+print(e[3], dig = 10)
+print(e3, dig = 10)
+
+toy$d <- d
+toy$new <- e # name in the toyframe independent of original object name
+toy$f <- rep(NA, times = 4)
+
+toy$d
+toy$d <- c('o', 'v', 'e', 'r') # overwrites existing column with the same name
+toy$d
+```
+
+Now let's work with some real data. It will be bigger and messier than our toy dataset:
+```{r}
+setwd('/Users/Dan/Documents/Teaching/R_intro/')
+demo <- read.table('Salamander_Demographics.csv', header = TRUE, sep = ",")
+
+head(demo)
+tail(demo)
+summary(demo)
+str(demo)
+```
+
+Let's create a dataframe with just the size data
+```{r}
+size.vars <- demo[c("svl", "tl", "mass")]
+head(size.vars)
+```
+
+or maybe we just want the first 5 rows
+```{r}
+demo5 <- demo[, c(1:5)]
+demo5b <- demo[c(1:5)]
+
+head(demo5)
+head(demo5b)
+```
+
+Delete some variables
+```{r}
+rm.vars <- names(demo) %in% c("id", "mark", "recap")
+newdemo <- demo[!rm.vars]
+head(newdemo)
+
+newdemo2 <- demo[c(-1, -3)]
+head(newdemo2)
+
+newdemo2$id <- newdemo2$mark <- NULL
+head(newdemo2)
+```
+
+Select Observations
+```{r}
+# based on variable values
+newdemo <- demo[ which(demo$sex=='Y' & demo$mass > 1.0), ]
+str(demo)
+str(newdemo)
+```
+
+Subset Function
+```{r}
+newdemo <- subset(demo, sex=="X" & gravid == "Y", select = mass:tl) 
+str(newdemo)
+head(newdemo)
+```
+
+Make table and export as csv file
+```{r}
+write.table(x = newdemo, file = "Gravid_Female_Demographics.csv", sep = ",")
+```
+
+Sorting Data
+There is no undo key in R. If you write over or delete an object or column, it's gone. Similarly, if you sort you can't unsort. I like to have a primary key (line number) so can always return to orginal order.
+```{r}
+demo$key <- seq(1, length(demo$svl))
+head(demo, n = 10)
+demo <- demo[order(demo$mass), ] # if don't want to create extra dataframes
+demo.sort <- demo[order(demo$mass), ] # alt create new sorted dataframe
+head(demo, n = 10)
+
+demo.sort <- demo[order(demo$sex, demo$svl), ]
+head(demo.sort, n = 10)
+```
+
+### On your own:
+Add column of random numbers from your favorite distribution (hint ?rnorm) and sort by tl and then that column from largest to smallest.
+
+
+### Further exploration:
+built-in (base) functions:
+by
+aggregate
+
+Packages to try:
+plyr
+reshape2
+
+
+
