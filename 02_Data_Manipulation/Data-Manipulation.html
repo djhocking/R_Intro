@@ -272,8 +272,8 @@ toy$d
 
 <pre><code class="r">setwd(&quot;/Users/Dan/Documents/Teaching/R_intro/02_Data_Manipulation/&quot;)
 library(RCurl)
-url &lt;- foo &lt;- getURL(&quot;https://raw.github.com/djhocking/R_Intro/master/02_Data_Manipulation/Salamander_Demographics.csv&quot;, 
-    ssl.verifypeer = FALSE)  ## ssl.verifypeer is to subverte an SSL error you get otherwise
+foo &lt;- getURL(&quot;https://raw.github.com/djhocking/R_Intro/master/02_Data_Manipulation/Salamander_Demographics.csv&quot;, 
+    ssl.verifypeer = TRUE)
 demo &lt;- read.table(textConnection(foo), header = TRUE, sep = &quot;,&quot;, na.strings = NA)
 # demo &lt;- read.table(&#39;Salamander_Demographics.csv&#39;, header = TRUE, sep =
 # &#39;,&#39;) # alternatively you can download data from GitHub into your working

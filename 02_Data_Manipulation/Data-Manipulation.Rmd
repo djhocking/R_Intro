@@ -52,8 +52,7 @@ Now let's work with some real data. It will be bigger and messier than our toy d
 ```{r}
 setwd('/Users/Dan/Documents/Teaching/R_intro/02_Data_Manipulation/')
 library(RCurl)
-url <- 
-foo <- getURL("https://raw.github.com/djhocking/R_Intro/master/02_Data_Manipulation/Salamander_Demographics.csv", ssl.verifypeer = FALSE) ## ssl.verifypeer is to subverte an SSL error you get otherwise
+foo <- getURL("https://raw.github.com/djhocking/R_Intro/master/02_Data_Manipulation/Salamander_Demographics.csv", ssl.verifypeer = TRUE)
 demo <- read.table(textConnection(foo), header=TRUE, sep=",", na.strings=NA)
 # demo <- read.table('Salamander_Demographics.csv', header = TRUE, sep = ",") # alternatively you can download data from GitHub into your working directory and load from the local file
 
