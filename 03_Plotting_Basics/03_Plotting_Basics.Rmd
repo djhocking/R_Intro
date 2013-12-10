@@ -1,0 +1,52 @@
+# R Plotting Basics
+
+### Daniel J. Hocking
+### 09 December 2013
+### UNH R Working Group
+
+Set working directory and load data
+```{r}
+setwd('/Users/Dan/Documents/Teaching/R_intro/03_Plotting_Basics/')
+
+library(RCurl)
+foo <- getURL("https://raw.github.com/djhocking/R_Intro/master/Data/Salamander_Demographics.csv", ssl.verifypeer = TRUE)
+demo <- read.table(textConnection(foo), header = TRUE, sep = ",", na.strings = NA)
+# demo <- read.table('Salamander_Demographics.csv', header = TRUE, sep = ",") # alternatively you can download data from GitHub into your working directory and load from the local file
+
+str(demo)
+head(demo)
+tail(demo)
+summary(demo)
+```
+
+Scatterplot
+```{r}
+plot(demo$svl, demo$mass, xlab = "Snout-vent length (mm)", ylab = "Mass (g)")
+```
+
+Add different symbols for males, females, juveniles (UI)
+```{r}
+plot(demo$svl, demo$mass, xlab = "Snout-vent length (mm)", ylab = "Mass (g)", pch=as.integer(demo$sex))
+```
+
+Add colors for males, females, juveniles (UI)
+```{r}
+plot(demo$svl, demo$mass, xlab = "Snout-vent length (mm)", ylab = "Mass (g)", pch = as.integer(demo$sex), col = as.integer(demo$sex))
+```
+
+Add smooth spline (curve through the points)
+```{r}
+lines(smooth.spline(demo[which(demo$svl != NA & demo$mass != NA)]$svl, demo$mass))
+
+Add legend
+```{r}
+plot(demo$svl, demo$mass, xlab = "Snout-vent length (mm)", ylab = "Mass (g)", pch = as.integer(demo$sex), col = as.integer(demo$sex))
+legend
+```
+
+
+
+
+
+
+
