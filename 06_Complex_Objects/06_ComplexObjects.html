@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Complex Objects in R</title>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Complex Objects in R</h1>
+
+<h3>Daniel J. Hocking</h3>
+
+<h3>UNH R Working Group</h3>
+
+<p>This lesson is intended to help you understand complex objects in R. These are often returned as part of functions the perform a statistical analysis. By the end of this lesson you should be able to exact information from anywhere in an object for use in tables, figures, and other analyses.  </p>
+
+<p>This lesson assumes that you are familiar with the basic R objects and data types and that you have a working knowledge of linear regression models.  </p>
+
+<p>First load the salamander data from the previous lesson</p>
+
+<pre><code class="r">setwd(&quot;/Users/Dan/Documents/Teaching/R_intro/06_Complex_Objects&quot;)
+library(RCurl)
+foo &lt;- getURL(&quot;https://raw.github.com/djhocking/R_Intro/master/Data/Salamander_Demographics.csv&quot;, 
+    followlocation = TRUE, cainfo = system.file(&quot;CurlSSL&quot;, &quot;cacert.pem&quot;, package = &quot;RCurl&quot;))
+demo &lt;- read.table(textConnection(foo), header = TRUE, sep = &quot;,&quot;, na.strings = NA)
+
+# str(demo) summary(demo)
+</code></pre>
+
+<p>Now let&#39;s run a simple linear regression on mass as a function of snout-vent length (svl), look at the summary and at the data stored in the output of the lm function.</p>
+
+<pre><code class="r">m1 &lt;- lm(mass ~ svl, data = demo, na.action = na.omit)
+summary(m1)
+</code></pre>
+
+<pre><code>## 
+## Call:
+## lm(formula = mass ~ svl, data = demo, na.action = na.omit)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.4236 -0.0767 -0.0155  0.0653  0.7085 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.756416   0.012135   -62.3   &lt;2e-16 ***
+## svl          0.038465   0.000314   122.4   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.117 on 3375 degrees of freedom
+##   (5 observations deleted due to missingness)
+## Multiple R-squared:  0.816,  Adjusted R-squared:  0.816 
+## F-statistic: 1.5e+04 on 1 and 3375 DF,  p-value: &lt;2e-16
+</code></pre>
+
+<pre><code class="r">m1
+</code></pre>
+
+<pre><code>## 
+## Call:
+## lm(formula = mass ~ svl, data = demo, na.action = na.omit)
+## 
+## Coefficients:
+## (Intercept)          svl  
+##     -0.7564       0.0385
+</code></pre>
+
+<pre><code class="r">str(m1)
+</code></pre>
+
+<pre><code>## List of 13
+##  $ coefficients : Named num [1:2] -0.7564 0.0385
+##   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;svl&quot;
+##  $ residuals    : Named num [1:3377] -0.0859 -0.0338 -0.2201 0.0234 -0.0315 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:3377] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ effects      : Named num [1:3377] -41.1289 14.3441 -0.219 0.0244 -0.0307 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:3377] &quot;(Intercept)&quot; &quot;svl&quot; &quot;&quot; &quot;&quot; ...
+##  $ rank         : int 2
+##  $ fitted.values: Named num [1:3377] 0.513 0.667 0.859 0.898 0.975 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:3377] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ assign       : int [1:2] 0 1
+##  $ qr           :List of 5
+##   ..$ qr   : num [1:3377, 1:2] -58.112 0.0172 0.0172 0.0172 0.0172 ...
+##   .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. ..$ : chr [1:3377] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##   .. .. ..$ : chr [1:2] &quot;(Intercept)&quot; &quot;svl&quot;
+##   .. ..- attr(*, &quot;assign&quot;)= int [1:2] 0 1
+##   ..$ qraux: num [1:2] 1.02 1
+##   ..$ pivot: int [1:2] 1 2
+##   ..$ tol  : num 1e-07
+##   ..$ rank : int 2
+##   ..- attr(*, &quot;class&quot;)= chr &quot;qr&quot;
+##  $ df.residual  : int 3375
+##  $ na.action    :Class &#39;omit&#39;  Named int [1:5] 6 9 10 876 1184
+##   .. ..- attr(*, &quot;names&quot;)= chr [1:5] &quot;6&quot; &quot;9&quot; &quot;10&quot; &quot;876&quot; ...
+##  $ xlevels      : Named list()
+##  $ call         : language lm(formula = mass ~ svl, data = demo, na.action = na.omit)
+##  $ terms        :Classes &#39;terms&#39;, &#39;formula&#39; length 3 mass ~ svl
+##   .. ..- attr(*, &quot;variables&quot;)= language list(mass, svl)
+##   .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. ..$ : chr [1:2] &quot;mass&quot; &quot;svl&quot;
+##   .. .. .. ..$ : chr &quot;svl&quot;
+##   .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;svl&quot;
+##   .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. ..- attr(*, &quot;predvars&quot;)= language list(mass, svl)
+##   .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;mass&quot; &quot;svl&quot;
+##  $ model        :&#39;data.frame&#39;:   3377 obs. of  2 variables:
+##   ..$ mass: num [1:3377] 0.427 0.633 0.639 0.921 0.943 ...
+##   ..$ svl : int [1:3377] 33 37 42 43 45 47 48 32 32 33 ...
+##   ..- attr(*, &quot;terms&quot;)=Classes &#39;terms&#39;, &#39;formula&#39; length 3 mass ~ svl
+##   .. .. ..- attr(*, &quot;variables&quot;)= language list(mass, svl)
+##   .. .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. .. ..$ : chr [1:2] &quot;mass&quot; &quot;svl&quot;
+##   .. .. .. .. ..$ : chr &quot;svl&quot;
+##   .. .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;svl&quot;
+##   .. .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. .. ..- attr(*, &quot;predvars&quot;)= language list(mass, svl)
+##   .. .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;mass&quot; &quot;svl&quot;
+##   ..- attr(*, &quot;na.action&quot;)=Class &#39;omit&#39;  Named int [1:5] 6 9 10 876 1184
+##   .. .. ..- attr(*, &quot;names&quot;)= chr [1:5] &quot;6&quot; &quot;9&quot; &quot;10&quot; &quot;876&quot; ...
+##  - attr(*, &quot;class&quot;)= chr &quot;lm&quot;
+</code></pre>
+
+<p>As you&#39;ll notice, and remember from the introduction to regression in R, the summary function produces a nice output of the analysis. Running the object just prints some minimal information. The <code>str()</code> function shows everything that is stored in the object, the type class of each part of the object, and the hierarchical arrangement of the information. There is a lot of information in an object returned from just a simple linear regression. It can seem overwhelming at first, but once you learn to read the strucutre output, it you can interpret and extract information from any size object.  </p>
+
+<p>First, it tells us that m1 is a list of 13 objects. We know we can extract information from a list using square brackets like <code>m1[1]</code>. This isn&#39;t that useful though, because keeping track of the numbers is challenging so instead we&#39;ll use the name it gives us for each item.   </p>
+
+<p>The first item in the list is &quot;coefficients&quot; and this is a Named number. In this case it returns two numbers <code>-0.7564</code> and <code>0.0385</code>, named <code>&quot;(Intercept)&quot;</code> and <code>&quot;svl&quot;</code>. The next item in the list are the residuals which is a named number (vector with associated names for each value) of length 3,377. This is correct as there is 1 residual per data point. This is how far each data point is from the mean regression line. In this case, the lm function names names the values &quot;1&quot; through &quot;3377&quot;. Also of interest is item 5 in the list <code>$fitted.values</code>. This is the expected value of mass for each value of svl in the dataset according to the regression equation <code>E(mass) = -0.7564 + 0.0385 * svl</code>. These and residuals are often useful for plotting. Remember, one assumption of a linear model is that the residuals are normally distributed around 0 and homogenous (they don&#39;t get larger or smaller as expected values get larger). So let&#39;s exact this data from the object <code>m1</code> and plot it.</p>
+
+<pre><code class="r">m1.resid &lt;- m1$residuals
+m1.fit &lt;- m1$fitted.values
+
+# Have students come up with how to plot now that data is extracted
+plot(m1.fit, m1.resid, xlab = &quot;Fitted Values&quot;, ylab = &quot;Residuals&quot;)
+abline(h = 0, col = &quot;red&quot;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-3.png" alt="plot of chunk unnamed-chunk-3"> </p>
+
+<p>Now what if we want to make a table for a paper similar to that produced by the <code>summary</code> function. We could copy and paste it into a text document or spreadsheet and manipulate it there, but that would be a pain, slow to do multiple times, and is not easily reproducible. The answer is to save the summary output as an object and extract the information from it and write that table out as a specific file.</p>
+
+<pre><code class="r">m1.sum &lt;- summary(m1)
+str(m1.sum)
+</code></pre>
+
+<pre><code>## List of 12
+##  $ call         : language lm(formula = mass ~ svl, data = demo, na.action = na.omit)
+##  $ terms        :Classes &#39;terms&#39;, &#39;formula&#39; length 3 mass ~ svl
+##   .. ..- attr(*, &quot;variables&quot;)= language list(mass, svl)
+##   .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. ..$ : chr [1:2] &quot;mass&quot; &quot;svl&quot;
+##   .. .. .. ..$ : chr &quot;svl&quot;
+##   .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;svl&quot;
+##   .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. ..- attr(*, &quot;predvars&quot;)= language list(mass, svl)
+##   .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;mass&quot; &quot;svl&quot;
+##  $ residuals    : Named num [1:3377] -0.0859 -0.0338 -0.2201 0.0234 -0.0315 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:3377] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ coefficients : num [1:2, 1:4] -7.56e-01 3.85e-02 1.21e-02 3.14e-04 -6.23e+01 ...
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : chr [1:2] &quot;(Intercept)&quot; &quot;svl&quot;
+##   .. ..$ : chr [1:4] &quot;Estimate&quot; &quot;Std. Error&quot; &quot;t value&quot; &quot;Pr(&gt;|t|)&quot;
+##  $ aliased      : Named logi [1:2] FALSE FALSE
+##   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;svl&quot;
+##  $ sigma        : num 0.117
+##  $ df           : int [1:3] 2 3375 2
+##  $ r.squared    : num 0.816
+##  $ adj.r.squared: num 0.816
+##  $ fstatistic   : Named num [1:3] 14973 1 3375
+##   ..- attr(*, &quot;names&quot;)= chr [1:3] &quot;value&quot; &quot;numdf&quot; &quot;dendf&quot;
+##  $ cov.unscaled : num [1:2, 1:2] 1.07e-02 -2.74e-04 -2.74e-04 7.19e-06
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : chr [1:2] &quot;(Intercept)&quot; &quot;svl&quot;
+##   .. ..$ : chr [1:2] &quot;(Intercept)&quot; &quot;svl&quot;
+##  $ na.action    :Class &#39;omit&#39;  Named int [1:5] 6 9 10 876 1184
+##   .. ..- attr(*, &quot;names&quot;)= chr [1:5] &quot;6&quot; &quot;9&quot; &quot;10&quot; &quot;876&quot; ...
+##  - attr(*, &quot;class&quot;)= chr &quot;summary.lm&quot;
+</code></pre>
+
+<pre><code class="r">
+m1.sum$coefficients
+</code></pre>
+
+<pre><code>##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) -0.75642  0.0121345  -62.34        0
+## svl          0.03847  0.0003144  122.36        0
+</code></pre>
+
+<pre><code class="r">m1.sum$coefficients[&quot;svl&quot;, ]
+</code></pre>
+
+<pre><code>##   Estimate Std. Error    t value   Pr(&gt;|t|) 
+##  3.847e-02  3.144e-04  1.224e+02  0.000e+00
+</code></pre>
+
+<pre><code class="r">
+write.table(m1.sum$coefficients, &quot;Regression-Table.csv&quot;, sep = &quot;,&quot;)
+</code></pre>
+
+<p>Hopefully now you feel more comfortable understanding and extracing items from complex objects in R. There will inevitable be parts of object that you don&#39;t understand. In those cases, look in the help documents and if all else fails, extract, summarize, and plot those objects and think what they might mean in relation to the function. Eventually you might want to look at the function and see the underlying code to figure out what it&#39;s doing, but that&#39;s for another day.   </p>
+
+<h3>Additional Reading and Helpful Functions</h3>
+
+<p><a href="http://cran.r-project.org/web/packages/xtable/vignettes/xtableGallery.pdf">xtable</a> - a packge to make easier, prettier tables.<br>
+<a href="http://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf">stargazer</a> - possibly the best package for making publication-quality tables in R, especially associated with common analyses like linear regression using the <code>lm</code> function.  </p>
+
+</body>
+
+</html>

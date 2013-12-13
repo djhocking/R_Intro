@@ -34,19 +34,64 @@ Add colors for males, females, juveniles (UI)
 plot(demo$svl, demo$mass, xlab = "Snout-vent length (mm)", ylab = "Mass (g)", pch = as.integer(demo$sex), col = as.integer(demo$sex))
 ```
 
-Add smooth spline (curve through the points)
+Add smooth spline (curve through the points). You don't need to make the plot again. The function "lines" adds the line to the most recent plot. In this case, smooth.spline doesn't handle missing data so we have to take it out explicitly.
 ```{r}
-lines(smooth.spline(demo[which(demo$svl != NA & demo$mass != NA)]$svl, demo$mass))
+lines(smooth.spline(demo[which(demo$svl != "NA" & demo$mass != "NA"), ]$svl, demo[which(demo$svl != "NA" & demo$mass != "NA"), ]$mass))
+```
 
 Add legend
 ```{r}
+legend(x = 15, y = 1.9, legend = levels(demo$sex), pch = 1:5, col = 1:5)
+```
+
+Fix the spacing around the plot and the tick marks. 
+
+![R plot area](rmargins_sf.png)
+
+via http://rgraphics.limnology.wisc.edu/rmargins_sf.php. More info at http://rfunction.com/archives/1302
+
+Final Plot using base R graphics and export as pdf, eps, tiff, etc.
+
+Table from Quick-R (http://www.statmethods.net/graphs/creating.html)
+
+|Function                     | Output to         |
+| --------------------------- | ----------------- |
+|pdf("mygraph.pdf")           |	pdf file          |
+|win.metafile("mygraph.wmf")  |	windows metafile  |
+|png("mygraph.png")           |	png file          |
+|jpeg("mygraph.jpg")          |	jpeg file         |
+|bmp("mygraph.bmp")           |	bmp file          |
+|postscript("mygraph.ps")     |	postscript file   |
+
+
+Putting it all together:
+```{r}
+pdf("SVL-Mass.pdf", width = 10, height = 8)
+par(mar = c(3.5,3,2,1), mgp = c(2,.7,0), tck = -.02)
 plot(demo$svl, demo$mass, xlab = "Snout-vent length (mm)", ylab = "Mass (g)", pch = as.integer(demo$sex), col = as.integer(demo$sex))
-legend
+lines(smooth.spline(demo[which(demo$svl != "NA" & demo$mass != "NA"), ]$svl, demo[which(demo$svl != "NA" & demo$mass != "NA"), ]$mass))
+legend(x = 15, y = 1.9, legend = c("Unknown", "Adult", "Juvenile", "Female", "Male"), pch = 1:5, col = 1:5)
+dev.off()
 ```
 
 
+Other Base Plots
+
+Histogram
+```{r}
+hist(demo$mass, breaks = 20)
+```
+
+Kernel Density
+```{r}
+plot(density(demo$mass, na.rm = TRUE))
+```
+
+Boxplot
+```{r}
+boxplot(demo$mass ~ demo$sex, ylab = "Mass (g)")
+```
 
 
-
-
+### Activity: Make a kernel density plot on top of a histogram
 

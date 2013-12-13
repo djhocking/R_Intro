@@ -1,0 +1,67 @@
+# Complex Objects in R
+
+### Daniel J. Hocking
+### UNH R Working Group
+
+This lesson is intended to help you understand complex objects in R. These are often returned as part of functions the perform a statistical analysis. By the end of this lesson you should be able to exact information from anywhere in an object for use in tables, figures, and other analyses.  
+
+This lesson assumes that you are familiar with the basic R objects and data types and that you have a working knowledge of linear regression models.  
+
+First load the salamander data from the previous lesson
+
+```{r}
+setwd('/Users/Dan/Documents/Teaching/R_intro/06_Complex_Objects')
+library(RCurl)
+foo <- getURL("https://raw.github.com/djhocking/R_Intro/master/Data/Salamander_Demographics.csv", followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+demo <- read.table(textConnection(foo), header = TRUE, sep = ",", na.strings = NA)
+
+#str(demo)
+#summary(demo)
+```
+
+Now let's run a simple linear regression on mass as a function of snout-vent length (svl), look at the summary and at the data stored in the output of the lm function.
+
+```{r}
+m1 <- lm(mass ~ svl, data = demo, na.action = na.omit)
+summary(m1)
+m1
+str(m1)
+```
+
+As you'll notice, and remember from the introduction to regression in R, the summary function produces a nice output of the analysis. Running the object just prints some minimal information. The `str()` function shows everything that is stored in the object, the type class of each part of the object, and the hierarchical arrangement of the information. There is a lot of information in an object returned from just a simple linear regression. It can seem overwhelming at first, but once you learn to read the strucutre output, it you can interpret and extract information from any size object.  
+
+First, it tells us that m1 is a list of 13 objects. We know we can extract information from a list using square brackets like `m1[1]`. This isn't that useful though, because keeping track of the numbers is challenging so instead we'll use the name it gives us for each item.   
+
+The first item in the list is "coefficients" and this is a Named number. In this case it returns two numbers `-0.7564` and `0.0385`, named `"(Intercept)"` and `"svl"`. The next item in the list are the residuals which is a named number (vector with associated names for each value) of length 3,377. This is correct as there is 1 residual per data point. This is how far each data point is from the mean regression line. In this case, the lm function names names the values "1" through "3377". Also of interest is item 5 in the list `$fitted.values`. This is the expected value of mass for each value of svl in the dataset according to the regression equation `E(mass) = -0.7564 + 0.0385 * svl`. These and residuals are often useful for plotting. Remember, one assumption of a linear model is that the residuals are normally distributed around 0 and homogenous (they don't get larger or smaller as expected values get larger). So let's exact this data from the object `m1` and plot it.
+
+```{r}
+m1.resid <- m1$residuals
+m1.fit <- m1$fitted.values
+
+# Have students come up with how to plot now that data is extracted
+plot(m1.fit, m1.resid, xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red")
+```
+
+Now what if we want to make a table for a paper similar to that produced by the `summary` function. We could copy and paste it into a text document or spreadsheet and manipulate it there, but that would be a pain, slow to do multiple times, and is not easily reproducible. The answer is to save the summary output as an object and extract the information from it and write that table out as a specific file.
+
+```{r}
+m1.sum <- summary(m1)
+str(m1.sum)
+
+m1.sum$coefficients
+m1.sum$coefficients["svl", ]
+
+write.table(m1.sum$coefficients, "Regression-Table.csv", sep = ",")
+```
+
+Hopefully now you feel more comfortable understanding and extracing items from complex objects in R. There will inevitable be parts of object that you don't understand. In those cases, look in the help documents and if all else fails, extract, summarize, and plot those objects and think what they might mean in relation to the function. Eventually you might want to look at the function and see the underlying code to figure out what it's doing, but that's for another day.   
+
+### Additional Reading and Helpful Functions
+[xtable](http://cran.r-project.org/web/packages/xtable/vignettes/xtableGallery.pdf) - a packge to make easier, prettier tables.  
+[stargazer](http://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf) - possibly the best package for making publication-quality tables in R, especially associated with common analyses like linear regression using the `lm` function.  
+
+
+
+
+
