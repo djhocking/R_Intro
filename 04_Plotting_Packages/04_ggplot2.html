@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>R Plotting: ggplot2</title>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>R Plotting: ggplot2</h1>
+
+<h3>Daniel J. Hocking</h3>
+
+<h3>16 December 2013</h3>
+
+<h3>UNH R Working Group</h3>
+
+<p>ggplot2 is an R package for graphing that uses a specific grammar to build graphics in a series of layers starting with the raw data. The grammar is based on &quot;Grammar of Graphics&quot; (Wilkinson 2005).   </p>
+
+<p>There is a tremendous amount of information available on ggplot2 online, owing to its popularity. There is also a book describing the package, &quot;ggplot2: Elegant Graphics for Data Analysis&quot; (Wickham 2009). The package creator, Hadley Wickham, provides information on his website: <a href="http://had.co.nz/ggplot2">http://had.co.nz/ggplot2</a>.   </p>
+
+<p>Basic Grammar Components:   </p>
+
+<ul>
+<li>data: data to visualize</li>
+<li>mapping: aesthetics describing how data are mapped to attributes</li>
+<li>geom: geometric objects printed on plot such as points, lines, polygons </li>
+<li>stats: optional statistics transformations for binning, counting, and summarizing data</li>
+<li>scale: translates data scales to aesthetic scales like color, size, shape and draws legend and axes</li>
+<li>coord: coordinate system describes how data and mapped to plane of graphic and provides axes and grid lines. Cartesian coordinates, polar coordinates, or map projections</li>
+<li>facet: faceting specifies how to break data into subsets (conditioning, latticing, or trellising)</li>
+<li>fonts, colors, etc. are specied via that theme and not as graphical grammar components<br></li>
+</ul>
+
+<p>First, import the salamander demographics data</p>
+
+<pre><code class="r">setwd(&quot;/Users/Dan/Documents/Teaching/R_intro/04_Plotting_Packages/&quot;)
+
+library(RCurl)
+foo &lt;- getURL(&quot;https://raw.github.com/djhocking/R_Intro/master/Data/Salamander_Demographics.csv&quot;, 
+    followlocation = TRUE, cainfo = system.file(&quot;CurlSSL&quot;, &quot;cacert.pem&quot;, package = &quot;RCurl&quot;))
+demo &lt;- read.table(textConnection(foo), header = TRUE, sep = &quot;,&quot;, na.strings = NA)
+# demo &lt;- read.table(&#39;Salamander_Demographics.csv&#39;, header = TRUE, sep =
+# &#39;,&#39;) # alternatively you can download data from GitHub into your working
+# directory and load from the local file
+</code></pre>
+
+<p>Remember the plot we created previously to visualize mass as a function of snout-vent length with different colors for different sex/age classes (below). We are going to recreate this using ggplot2</p>
+
+<pre><code class="r"># par(mar = c(3.5,3,2,1), mgp = c(2,.7,0), tck = -.02)
+plot(demo$svl, demo$mass, xlab = &quot;Snout-vent length (mm)&quot;, ylab = &quot;Mass (g)&quot;, 
+    pch = as.integer(demo$sex), col = as.integer(demo$sex))
+lines(smooth.spline(demo[which(demo$svl != &quot;NA&quot; &amp; demo$mass != &quot;NA&quot;), ]$svl, 
+    demo[which(demo$svl != &quot;NA&quot; &amp; demo$mass != &quot;NA&quot;), ]$mass))
+legend(x = 15, y = 1.9, legend = c(&quot;Unknown&quot;, &quot;Adult&quot;, &quot;Juvenile&quot;, &quot;Female&quot;, 
+    &quot;Male&quot;), pch = 1:5, col = 1:5)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-2.png" alt="plot of chunk unnamed-chunk-2"> </p>
+
+<p>We will start with a quick plot using the <code>qplot</code> function:</p>
+
+<pre><code class="r">library(ggplot2)
+qplot(svl, mass, data = demo)
+</code></pre>
+
+<pre><code>## Warning: Removed 5 rows containing missing values (geom_point).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-3.png" alt="plot of chunk unnamed-chunk-3"> </p>
+
+<p>This looks very similar to our original plot but with a different background and filled points. It also automatically removed missing values and produced a warning to let us know. This is using <code>geom = &quot;point&quot;</code> by default to produce a scatterplot because x and y values were supplied. With more ease than with the base <code>plot</code> function, we can add different colors and shapes for animals of different sexes and included a legend:</p>
+
+<pre><code class="r">qplot(svl, mass, data = demo,   # I only separate rows after the column so you can see what I added
+      colour = sex,             # notice the British spelling b/c Hadley is from NZ
+      shape = sex)
+</code></pre>
+
+<pre><code>## Warning: Removed 12 rows containing missing values (geom_point).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-4.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+<p>This was much easier than the base plot code! Now let&#39;s add the smoothing spline with the geom <code>smooth</code>:</p>
+
+<pre><code class="r">library(mgcv)  # needed for the smooth option with large datasets to do gam
+qplot(svl, mass, data = demo[which(demo$sex != &quot;UA&quot;), ], colour = sex, shape = sex, 
+    geom = c(&quot;point&quot;, &quot;smooth&quot;))
+</code></pre>
+
+<pre><code>## geom_smooth: method=&quot;auto&quot; and size of largest group is &gt;=1000, so using
+## gam with formula: y ~ s(x, bs = &quot;cs&quot;). Use &#39;method = x&#39; to change the
+## smoothing method.
+</code></pre>
+
+<pre><code>## Warning: Removed 1 rows containing missing values (stat_smooth). Warning:
+## Removed 1 rows containing missing values (stat_smooth). Warning: Removed 2
+## rows containing missing values (geom_point).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-5.png" alt="plot of chunk unnamed-chunk-5"> </p>
+
+<p>AFTER the plot is created the non-data part of the graphic can be manipulated by altering the theme. There are built-in themes or you can customize any aspect with your own theme. Themes can also be changed on a global setting with the <code>theme_set(theme_grey())</code> funtion or locally with the <code>qplot(...) + theme_grey()</code>. </p>
+
+<pre><code class="r">qplot(svl, mass, data = demo[which(demo$sex != &quot;UA&quot;), ]) + geom_smooth(se = FALSE) + 
+    theme_bw()
+</code></pre>
+
+<pre><code>## geom_smooth: method=&quot;auto&quot; and size of largest group is &gt;=1000, so using
+## gam with formula: y ~ s(x, bs = &quot;cs&quot;). Use &#39;method = x&#39; to change the
+## smoothing method.
+</code></pre>
+
+<pre><code>## Warning: Removed 2 rows containing missing values (stat_smooth). Warning:
+## Removed 2 rows containing missing values (geom_point).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-6.png" alt="plot of chunk unnamed-chunk-6"> </p>
+
+<p>Let&#39;s make a custom theme</p>
+
+<pre><code class="r">theme_eco &lt;- function(base_size = 12, base_family = &quot;Helvetica&quot;, legend_position = &quot;right&quot;) {
+    theme(text = element_text(family = base_family, face = &quot;plain&quot;, colour = &quot;black&quot;, 
+        size = base_size), panel.background = element_blank(), legend.key = element_blank(), 
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank(), 
+        axis.line = element_line(colour = &quot;black&quot;), axis.text.x = element_text(colour = &quot;black&quot;), 
+        axis.text.y = element_text(colour = &quot;black&quot;), legend.position = legend_position)
+}
+
+
+p1 &lt;- qplot(svl, mass, data = demo, colour = sex, shape = sex, xlab = &quot;Snout-vent length (mm)&quot;, 
+    ylab = &quot;Mass (g)&quot;)
+
+p1 + theme_eco(legend_position = c(0.1, 0.8))
+</code></pre>
+
+<pre><code>## Warning: Removed 12 rows containing missing values (geom_point).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-7.png" alt="plot of chunk unnamed-chunk-7"> </p>
+
+<p>Other quick plots using ggplot include boxplots, histograms, and density plots.</p>
+
+<pre><code class="r">library(grid)
+
+plot1 &lt;- qplot(svl, mass, data = demo, geom = &quot;point&quot;) + theme_eco()
+plot2 &lt;- qplot(svl, data = demo, geom = &quot;histogram&quot;) + theme_eco()
+plot3 &lt;- qplot(svl, data = demo, geom = &quot;density&quot;) + theme_eco()
+plot4 &lt;- qplot(sex, svl, data = demo, geom = &quot;boxplot&quot;) + theme_eco()
+
+vplayout &lt;- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(2, 2)))
+print(plot1, vp = vplayout(1, 1))
+</code></pre>
+
+<pre><code>## Warning: Removed 5 rows containing missing values (geom_point).
+</code></pre>
+
+<pre><code class="r">print(plot2, vp = vplayout(1, 2))
+</code></pre>
+
+<pre><code>## stat_bin: binwidth defaulted to range/30. Use &#39;binwidth = x&#39; to adjust
+## this.
+</code></pre>
+
+<pre><code class="r">print(plot3, vp = vplayout(2, 1))
+</code></pre>
+
+<pre><code>## Warning: Removed 3 rows containing non-finite values (stat_density).
+</code></pre>
+
+<pre><code class="r">print(plot4, vp = vplayout(2, 2))
+</code></pre>
+
+<pre><code>## Warning: Removed 3 rows containing non-finite values (stat_boxplot).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-8.png" alt="plot of chunk unnamed-chunk-8"> </p>
+
+<p>Facets are like lattice plots. They easily replicate plots in a grid by a categorical variable.</p>
+
+<pre><code class="r">
+qplot(svl, mass, data = demo) + facet_grid(. ~ sex)
+</code></pre>
+
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_point). Warning:
+## Removed 1 rows containing missing values (geom_point). Warning: Removed 3
+## rows containing missing values (geom_point).
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-9.png" alt="plot of chunk unnamed-chunk-9"> </p>
+
+</body>
+
+</html>
