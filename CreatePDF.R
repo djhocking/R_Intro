@@ -17,6 +17,11 @@ knit("04_ggplot2.Rmd")
 markdownToHTML('04_ggplot2.md', '04_ggplot2.html', options=c("use_xhml"))
 system("pandoc -s 04_ggplot2.html -o 04_ggplot2.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
 
+# Lesson 5: Basic Stats
+knit("Basic_Stats.Rmd")
+markdownToHTML('Basic_Stats.md', 'Basic_Stats.html', options=c("use_xhml"))
+system("pandoc -s Basic_Stats.html -o Basic_Stats.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
 
 # Lesson 6: Complex Objects from Functions
 knit("06_ComplexObjects.Rmd")

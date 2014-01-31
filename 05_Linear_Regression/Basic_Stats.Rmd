@@ -1,0 +1,127 @@
+# Basic Statistics in R
+
+### Daniel J. Hocking
+### 21 January 2014
+### UNH R Working Group
+
+## Load Data and Packages
+```{r}
+library(RCurl)
+
+setwd("/Users/Dan/Documents/Teaching/R_intro/05_Linear_Regression/")
+
+foo <- getURL("https://raw.github.com/djhocking/R_Intro/master/Data/Salamander_Demographics.csv", followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+
+demo <- read.table(textConnection(foo), header = TRUE, sep = ",", na.strings = NA)
+```
+
+## Linear Regression
+
+Remember our plot from last time showing the relationship between mass and snout-vent length:
+
+```{r}
+library(ggplot2)
+p1 <- ggplot(data = demo, aes(x = svl, y = mass, colour = sex, shape = sex))
+p1 + geom_point() + xlab("Snout-vent length (mm)") + ylab("Mass (g)") + theme_bw(legend_position = c(0.1, 0.8))
+```
+
+We're interested in the relationship between length and mass. It is nonlinear, so we can log transform both variables to make it linear. A simple linear regression would be:
+
+```{r}
+m1 <- lm(log(mass) ~ log(svl), data = demo)
+m1 # doesn't show us much information
+summary(m1) # shows us the info we're genearlly looking for
+```
+
+In the `lm` function in R, the intercept is assumed so it is not written in the model usually. However, it can be explicitly added and the model is the same. Most people do not write the `1` for the intercept but if it helps you better understand the model you can include it.
+
+```{r}
+m1a <- lm(log(mass) ~ 1 + log(svl), data = demo)
+summary(m1a)
+```
+
+This is fine, but based on our plot the sex of animals could influence the mass so we can add that as a parameter.
+
+```{r}
+m2 <- lm(log(mass) ~ log(svl) + sex, data = demo)
+summary(m2)
+```
+
+### Task
+In pairs or small groups can you test whether there is a significant interaction effect between log(svl) and sex on log(mass)? HINT: An interaction is just created by multipling two predictor variables.
+
+### Solution
+```{r}
+m3 <- lm(log(mass) ~ log(svl) * sex, data = demo)
+summary(m3)
+```
+
+In R this is the same as writing out the model more explicitly as:
+```{r}
+m3a <- lm(log(mass) ~ 1+ log(svl) + sex + log(svl) * sex, data = demo)
+summary(m3a)
+```
+
+To see how to add polynomial functions, we will simulate some data and analyze it using a squared term in a linear regression. Lets imagine we're counting the number of beetles on a mountain and we expect they are rare at low and high elevations but abundant at mid elevations.
+
+```{r}
+elev <- seq(from = 100, to = 2000, by = 50) # sample stations every 50 m elevation
+intercept <- 10
+b.elev <- 0.1
+b.elev2 <- -0.00005
+error <- rnorm(length(elev), 0, 5.2)
+y <- intercept + b.elev * elev + b.elev2 * elev ^ 2 + error
+
+df <- data.frame(count, elev)
+ggplot(df, aes(x = elev, y = y)) + geom_point()
+```
+
+Linear Regression
+
+```{r}
+lm.count <- lm(count ~ elev + I(elev ^ 2), data = df)
+summary(lm.count)
+```
+
+Now let's make sure our models fit the assumptions of linear regression such as normally distributed error, homogeneity of variance. There are some tests for these but it's often best just to examine the residual plots.
+
+```{r eval = FALSE}
+plot(lm.count)
+```
+
+```{r eval = FALSE}
+plot(m2)
+
+#plot(log(demo$mass), predict(m2))
+plot(fitted(m2), resid(m2))
+```
+
+## ANOVA
+
+ANOVA is a bit tricky in R. It is different than in SAS. In R the order of the factors matters (equivalent to Type I ANOVA is SAS).
+
+```{r}
+lm1 <- lm(mass ~ sex + plot, data = demo)
+a1 <- anova(lm1)
+summary(a1)
+
+lm2 <- lm(mass ~ plot + sex, data = demo)
+a2 <- anova(lm2)
+summary(a2)
+```
+
+The easiest way to get an ANOVA more inline with SAS is to use the `car` package which goes along with John Fox's book, "Companion to Applied Regression".
+
+```{r}
+library(car)
+a1.car <- Anova(lm1)
+summary(a1.car)
+
+a2.car <- Anova(lm2)
+summary(a2.car)
+```
+
+### Task
+Spend some time looking at relationships among other variables in the demo data or with your own data. Make some plots, run some regressions, compare the summaries. Compare simple and complex models.
+
+
