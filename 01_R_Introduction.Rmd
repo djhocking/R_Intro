@@ -1,0 +1,33 @@
+---
+title: "Untitled"
+author: "Daniel Hocking"
+date: "8/31/2017"
+output: pdf_document
+---
+
+
+## R Basics
+
+* Use it like a calculator
+* Assign objects
+* Object types and data structures
+* Reading and writing (saving) files
+* Saving RData
+* Saving rds
+
+
+## RStudio
+
+
+## Rmarkdown
+
+
+## Lesson 2: Data Structures and Getting data into R
+
+## Homework - ideally in RMarkdown
+
+
+
+
+
+
