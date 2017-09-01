@@ -27,3 +27,30 @@ system("pandoc -s Basic_Stats.html -o Basic_Stats.pdf -H /Users/Dan/Documents/Te
 knit("06_ComplexObjects.Rmd")
 markdownToHTML('06_ComplexObjects.md', '06_ComplexObjects.html', options=c("use_xhml"))
 system("pandoc -s 06_ComplexObjects.html -o 06_ComplexObjects.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
+# Lesson 7: Functions, Control Structures, Scoping
+setwd('/Users/Dan/Documents/Teaching/R_Intro/07_Software_Carpentry_Intermediate/functions/')
+knit("01-functions.Rmd")
+markdownToHTML('01-functions.md', '01-functions.html', options=c("use_xhml"))
+system("pandoc -s 01-functions.html -o 01-functions.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
+knit("02-control_structures.Rmd")
+markdownToHTML('02-control_structures.md', '02-control_structures.html', options=c("use_xhml"))
+system("pandoc -s 02-control_structures.html -o 02-control_structures.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
+knit("03-scoping_rules.Rmd")
+markdownToHTML('03-scoping_rules.md', '03-scoping_rules.html', options=c("use_xhml"))
+system("pandoc -s 03-scoping_rules.html -o 03-scoping_rules.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
+markdownToHTML('function_examples.md', 'function_examples.html', options=c("use_xhml"))
+system("pandoc -s function_examples.html -o function_examples.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
+markdownToHTML('exercises.md', 'exercises.html', options=c("use_xhml"))
+system("pandoc -s exercises.html -o exercises.pdf -H /Users/Dan/Documents/Teaching/R_Intro/margins.sty")
+
+
+
+
+
+
+
